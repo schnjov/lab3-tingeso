@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: preguntas-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: preguntas
+  template:
+    metadata:
+      labels:
+        app: preguntas
+    spec:
+      containers:
+        - name: preguntas
+          image: gcr.io/stately-fabric-391806/preguntas-service
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://postgres-deployment-service:5432/preguntas?autorReconnect=true&allowPublicKeyRetrieval=true&useSSL=false"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: preguntas-db-secret
+                  key: postgres-password
